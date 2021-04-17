@@ -41,6 +41,7 @@ class Query {
 public:
   virtual std::string executeLogic() = 0;
   virtual std::optional<std::string> getErrorMessage() { return std::nullopt; };
+    virtual ~Query() = default;
 };
 
 template<typename G>
