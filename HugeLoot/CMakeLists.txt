@@ -6,6 +6,88 @@
 # Source files.
 #
 
+##############################
+# General Settings
+##############################
+
+set (CMAKE_BINARY_DIR ./)
+set (CMAKE_SOURCE_DIR ./)
+set (LOOT_GUI_SRC "${CMAKE_BINARY_DIR}/generated/version.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/main.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/helpers.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_handler.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_app.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/window_delegate.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_handler.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_settings.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/helpers.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/logging.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_paths.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_settings.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_state.cpp"
+                  "${CMAKE_SOURCE_DIR}/src/gui/resource.rc")
+
+set (LOOT_GUI_HEADERS "${CMAKE_SOURCE_DIR}/src/gui/helpers.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_handler.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_app.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/window_delegate.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/derived_plugin_metadata.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/json.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_executor.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/apply_sort_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/cancel_sort_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/change_game_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clear_all_metadata_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clear_plugin_metadata_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clipboard_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/close_settings_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_content_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_load_order_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_metadata_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/discard_unapplied_changes_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/editor_opened_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/editor_closed_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_auto_sort_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_conflicting_plugins_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_game_data_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_game_types_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_init_errors_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_installed_games_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_settings_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_themes_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_version_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/metadata_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/open_log_location_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/open_readme_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/redate_plugins_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/save_filter_state_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/save_user_groups_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/sort_plugins_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/update_masterlist_query.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_handler.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_detection_error.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_settings.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/games_manager.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/helpers.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/logging.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_paths.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_settings.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_state.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/state/unapplied_change_counter.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/resource.h"
+                  "${CMAKE_SOURCE_DIR}/src/gui/version.h")
+
+source_group("Header Files\\gui" FILES ${LOOT_GUI_HEADERS})
+source_group("Source Files\\gui" FILES ${LOOT_GUI_SRC})
+
+# add header search path. TODO: required on windows?
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
   simple_app.cc
@@ -13,6 +95,7 @@ set(CEFSIMPLE_SRCS
   simple_handler.cc
   simple_handler.h
   )
+
 set(CEFSIMPLE_SRCS_LINUX
   cefsimple_linux.cc
   simple_handler_linux.cc
@@ -136,7 +219,7 @@ if(OS_MAC)
   endif()
 
   # Main app bundle target.
-  add_executable(${CEF_TARGET} MACOSX_BUNDLE ${CEFSIMPLE_RESOURCES_SRCS} ${CEFSIMPLE_SRCS})
+  add_executable(${CEF_TARGET} MACOSX_BUNDLE ${CEFSIMPLE_RESOURCES_SRCS} ${CEFSIMPLE_SRCS} ${LOOT_GUI_HEADERS} ${LOOT_GUI_SRC})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_TARGET} libcef_dll_wrapper ${CEF_STANDARD_LIBS})
