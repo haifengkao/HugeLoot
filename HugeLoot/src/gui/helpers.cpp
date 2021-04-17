@@ -41,7 +41,8 @@
 #include <windows.h>
 
 #elif defined(__APPLE__)
-
+#include <mach-o/dyld.h>
+#include <sys/syslimits.h>
 #else
 #include <unicode/uchar.h>
 #include <unicode/unistr.h>
@@ -183,9 +184,17 @@ std::filesystem::path getExecutableDirectory() {
 
   return std::filesystem::path(executablePathString).parent_path();
 #elif defined(__APPLE__)
-    return std::filesystem::path("/Volumes/MacintoshHD-資料/Dropbox/Project/HugeLoot/build/Debug/Loot").parent_path();
+    
+    char path[PATH_MAX + 1];
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size) == 0) {
+        return std::filesystem::path(path).parent_path();
+    }
+    
+    // TODO: not found
+    return std::filesystem::path("").parent_path();
 #else
-  char result[PATH_MAX];
+  char result[PATH_MAX + 1];
 
   ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
   if (count < 0) {
