@@ -45,9 +45,14 @@ Thumbs.db
 # CEF build directory
 /build
 # CEF download directory
-/third_party/cef/
+# /third_party/cef/
 # clang-format downloads
 /tools/buildtools/external_bin
 /tools/buildtools/linux64/clang-format
 /tools/buildtools/mac/clang-format
 /tools/buildtools/win/clang-format.exe
+third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64.tar.bz2
+third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64.tar.bz2.sha1
+third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64/Debug
+Chromium Embedded Framework
+third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64/Release
