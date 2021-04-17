@@ -147,3 +147,4 @@ void LootApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
   message_router_->OnContextCreated(browser, frame, context);
 }
 }
+

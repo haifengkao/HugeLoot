@@ -55,7 +55,7 @@ public:
   // Override CefApp methods.
   virtual void OnBeforeCommandLineProcessing(
       const CefString& process_type,
-      CefRefPtr<CefCommandLine> command_line);
+      CefRefPtr<CefCommandLine> command_line) override;
   virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
       OVERRIDE;
   virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() OVERRIDE;
@@ -85,3 +85,4 @@ private:
 }
 
 #endif
+
