@@ -1,10 +1,24 @@
 # Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
 # reserved. Use of this source code is governed by a BSD-style license that
 # can be found in the LICENSE file.
+cmake_minimum_required (VERSION 3.6)
+cmake_policy(SET CMP0015 NEW)
+cmake_policy(SET CMP0114 NEW) # Xcode "new build system"
+cmake_policy(SET CMP0074 NEW) # find_package uses <PackageName>_ROOT variables, e.g. CEF_ROOT
+project (HugeLOOT)
+include(ExternalProject)
 
-#
-# Source files.
-#
+option(MSVC_STATIC_RUNTIME "Build with static runtime libs (/MT)" OFF)
+
+IF (${MSVC_STATIC_RUNTIME})
+    set (MSVC_SHARED_RUNTIME OFF)
+ELSE()
+    set (MSVC_SHARED_RUNTIME ON)
+ENDIF()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ##############################
 # General Settings
@@ -12,6 +26,161 @@
 
 set (CMAKE_BINARY_DIR ./)
 set (CMAKE_SOURCE_DIR ./)
+
+##############################
+# Get Build Revision
+##############################
+
+find_package(Git)
+
+IF (GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                  OUTPUT_VARIABLE GIT_COMMIT_STRING
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+ELSE()
+    SET (GIT_COMMIT_STRING "unknown")
+ENDIF ()
+
+message(STATUS "Git revision: ${GIT_COMMIT_STRING}")
+
+# Write to file.
+configure_file("${CMAKE_SOURCE_DIR}/src/gui/version.cpp.in" "${CMAKE_BINARY_DIR}/generated/version.cpp" @ONLY)
+include_directories("${CMAKE_BINARY_DIR}/generated")
+
+##############################
+# External Projects
+##############################
+
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(SYSTEM_NAME "Windows")
+    if(CMAKE_SIZEOF_VOID_P MATCHES 8)
+        set(CEF_PLATFORM "windows64")
+    else()
+        set(CEF_PLATFORM "windows32")
+    endif()
+    set (Boost_USE_STATIC_LIBS ON)
+ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set(SYSTEM_NAME "Darwin")
+
+    if("${PROJECT_ARCH}" STREQUAL "arm64")
+        set(CEF_PLATFORM "macosarm64")
+    else()
+        set(CEF_PLATFORM "macosx64")
+    endif()
+
+    # a workaround for homebrew boost 1.75.0 https://github.com/Homebrew/homebrew-core/issues/67427#issuecomment-754141236
+    set (Boost_USE_STATIC_LIBS OFF)
+
+    # workaround because find_package(Boost) Could NOT find Threads
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_WIN32_THREADS_INIT 0)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+ELSE ()
+    set (Boost_USE_STATIC_LIBS ON)
+    set(SYSTEM_NAME "Other")
+    if(CMAKE_SIZEOF_VOID_P MATCHES 8)
+        set(CEF_PLATFORM "linux64")
+    else()
+        set(CEF_PLATFORM "linux32")
+    endif()
+ENDIF ()
+
+set (Boost_USE_MULTITHREADED ON)
+
+IF (MSVC)
+    set (Boost_USE_STATIC_RUNTIME ${MSVC_STATIC_RUNTIME})
+ELSE()
+    set (Boost_USE_STATIC_RUNTIME OFF)
+ENDIF()
+
+find_package(Boost REQUIRED COMPONENTS locale system)
+
+if (SYSTEM_NAME MATCHES "Other")
+    find_package(ICU REQUIRED COMPONENTS uc)
+    include_directories($ICU_INCLUDE_DIRS)
+    link_directories($ICU_LIBRARY_DIRS)
+endif()
+
+ExternalProject_Add(GTest
+                    PREFIX "external"
+                    URL "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
+                    CMAKE_ARGS -Dgtest_force_shared_crt=${MSVC_SHARED_RUNTIME}
+                    INSTALL_COMMAND "")
+ExternalProject_Get_Property(GTest SOURCE_DIR BINARY_DIR)
+set (GTEST_INCLUDE_DIRS "${SOURCE_DIR}/googletest/include")
+set (GTEST_LIBRARIES "${BINARY_DIR}/googlemock/gtest/${CMAKE_CFG_INTDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+if (NOT DEFINED LIBLOOT_URL)
+    if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+        if ("${CMAKE_GENERATOR_PLATFORM}" MATCHES "Win32")
+            set(LIBLOOT_URL "https://github.com/loot/libloot/releases/download/0.16.2/libloot-0.16.2-0-gc74c16b_0.16.2-win32.7z")
+        else()
+            set(LIBLOOT_URL "https://github.com/loot/libloot/releases/download/0.16.2/libloot-0.16.2-0-gc74c16b_0.16.2-win64.7z")
+        endif()
+    else()
+        set(LIBLOOT_URL "https://github.com/loot/libloot/releases/download/0.16.2/libloot-0.16.2-0-gc74c16b_0.16.2-Linux.tar.xz")
+    endif()
+endif()
+
+ExternalProject_Add(json
+                    PREFIX "external"
+                    URL "https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp"
+                    URL_HASH SHA256=7804b38146921d03374549c9e2a5e3acda097814c43caf2b96a0278e58df26e0
+                    DOWNLOAD_NO_EXTRACT 1
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+set(JSON_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/external/src")
+
+ExternalProject_Add(libloot
+                    PREFIX "external"
+                    # URL ${LIBLOOT_URL}
+                    SOURCE_DIR "../../../BigLoot/build/Debug"
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+ExternalProject_Get_Property(libloot SOURCE_DIR)
+set(LIBLOOT_EXTRACTED_PATH ${SOURCE_DIR})
+
+include_directories("${CMAKE_SOURCE_DIR}/src"
+                    "${LIBLOOT_EXTRACTED_PATH}/include")
+link_directories(${LIBLOOT_EXTRACTED_PATH})
+set(LIBLOOT_STATIC_LIBRARY "${CMAKE_STATIC_LIBRARY_PREFIX}loot${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(LIBLOOT_SHARED_LIBRARY "${CMAKE_SHARED_LIBRARY_PREFIX}loot${CMAKE_SHARED_LIBRARY_SUFFIX}")
+
+ExternalProject_Add(testing-plugins
+                    PREFIX "external"
+                    URL "https://github.com/Ortham/testing-plugins/archive/1.4.1.tar.gz"
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+
+ExternalProject_Add(cpptoml
+                    PREFIX "external"
+                    URL "https://github.com/skystrife/cpptoml/archive/v0.1.1.tar.gz"
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+ExternalProject_Get_Property(cpptoml SOURCE_DIR)
+set(CPPTOML_INCLUDE_DIRS "${SOURCE_DIR}/include")
+
+ExternalProject_Add(spdlog
+                    PREFIX "external"
+                    URL "https://github.com/gabime/spdlog/archive/v1.8.2.tar.gz"
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+ExternalProject_Get_Property(spdlog SOURCE_DIR)
+set(SPDLOG_INCLUDE_DIRS "${SOURCE_DIR}/include")
+
+#
+# Source files.
+#
+
 set (LOOT_GUI_SRC "${CMAKE_BINARY_DIR}/generated/version.cpp"
                   "${CMAKE_SOURCE_DIR}/src/gui/main.cpp"
                   "${CMAKE_SOURCE_DIR}/src/gui/helpers.cpp"
@@ -85,8 +254,65 @@ set (LOOT_GUI_HEADERS "${CMAKE_SOURCE_DIR}/src/gui/helpers.h"
 source_group("Header Files\\gui" FILES ${LOOT_GUI_HEADERS})
 source_group("Source Files\\gui" FILES ${LOOT_GUI_SRC})
 
-# add header search path. TODO: required on windows?
-include_directories(${CMAKE_SOURCE_DIR}/src)
+# Include source and library directories.
+include_directories ("${CMAKE_SOURCE_DIR}/src"
+                     ${CPPTOML_INCLUDE_DIRS}
+                     ${JSON_INCLUDE_DIRS}
+                     ${Boost_INCLUDE_DIRS}
+                     ${GTEST_INCLUDE_DIRS}
+                     ${SPDLOG_INCLUDE_DIRS})
+
+##############################
+# System-Specific Settings
+##############################
+
+# Settings when compiling for Windows.
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_definitions (-DUNICODE -D_UNICODE -DNOMINMAX -DBOOST_UUID_FORCE_AUTO_LINK)
+    set(LIBLOOT_LINK_LIBRARY ${LIBLOOT_STATIC_LIBRARY})
+else()
+    set(LIBLOOT_LINK_LIBRARY ${LIBLOOT_SHARED_LIBRARY})
+endif()
+
+IF(SYSTEM_NAME MATCHES "Darwin")
+    # find_library(FoundationLib CoreFoundation)
+    # find_library(SecurityLib Security)
+    find_library(ICONVLib iconv)
+    # set (LOOT_LIBS ${FoundationLib} ${SecurityLib} ${ICONVLib})
+    set (LOOT_LIBS ${ICONVLib})
+    set (LOOT_GUI_LIBS ${LOOT_LIBS})
+    set (LOOT_TEST_LIBS ${LOOT_LIBS})
+ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
+    set (CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};.")
+    set (CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+    set (LOOT_LIBS pthread http_parser ssh2 stdc++fs icui18n)
+    set (LOOT_GUI_LIBS X11 ${LOOT_LIBS})
+    set (LOOT_TEST_LIBS ${LOOT_LIBS})
+ENDIF ()
+
+IF (MSVC)
+    # Turn off permissive mode to be more standards-compliant and avoid compiler errors.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive-")
+
+    # Set /bigobj to allow building Debug tests
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+
+    # Update compiler flags.
+    IF (MSVC_STATIC_RUNTIME)
+        FOREACH(flag
+            CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO
+            CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_DEBUG_INIT
+            CMAKE_CXX_FLAGS_RELEASE  CMAKE_CXX_FLAGS_RELWITHDEBINFO
+            CMAKE_CXX_FLAGS_DEBUG  CMAKE_CXX_FLAGS_DEBUG_INIT)
+            STRING(REPLACE "/MD"  "/MT" "${flag}" "${${flag}}")
+            SET("${flag}" "${${flag}} /EHsc")
+        ENDFOREACH()
+    ENDIF ()
+
+    set (LOOT_GUI_LIBS comctl32
+                       Psapi)
+ENDIF ()
 
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
@@ -162,6 +388,12 @@ endif()
 # Determine the target output directory.
 SET_CEF_TARGET_OUT_DIR()
 
+##############################
+# Common Build Setting
+##############################
+set(HugeLootDep libcef_dll_wrapper cpptoml json libloot spdlog)
+set(HugeLootLib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${Boost_LIBRARIES} ${LIBLOOT_LINK_LIBRARY} ${LOOT_GUI_LIBS} ${ICU_LIBRARIES})
+
 
 #
 # Linux configuration.
@@ -171,8 +403,8 @@ if(OS_LINUX)
   # Executable target.
   add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
-  add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  add_dependencies(${CEF_TARGET} ${HugeLootDep})
+  target_link_libraries(${CEF_TARGET} libcef_lib ${HugeLootLib})
 
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
@@ -221,8 +453,8 @@ if(OS_MAC)
   # Main app bundle target.
   add_executable(${CEF_TARGET} MACOSX_BUNDLE ${CEFSIMPLE_RESOURCES_SRCS} ${CEFSIMPLE_SRCS} ${LOOT_GUI_HEADERS} ${LOOT_GUI_SRC})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
-  add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_TARGET} libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  add_dependencies(${CEF_TARGET} ${HugeLootDep})
+  target_link_libraries(${CEF_TARGET} ${HugeLootLib})
   set_target_properties(${CEF_TARGET} PROPERTIES
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/mac/Info.plist
     )
@@ -304,9 +536,9 @@ endif()
 if(OS_WINDOWS)
   # Executable target.
   add_executable(${CEF_TARGET} WIN32 ${CEFSIMPLE_SRCS})
-  add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
+  add_dependencies(${CEF_TARGET} ${HugeLootDep})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
-  target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_TARGET} libcef_lib ${HugeLootLib})
 
   if(USE_SANDBOX)
     # Logical target used to link the cef_sandbox library.

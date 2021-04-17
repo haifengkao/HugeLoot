@@ -4,7 +4,8 @@
 
 # See the included README.md file for usage instructions.
 
-cmake_minimum_required(VERSION 2.8.12.1)
+cmake_minimum_required (VERSION 3.6)
+cmake_policy(SET CMP0074 NEW) # find_package uses <PackageName>_ROOT variables, e.g. CEF_ROOT
 
 # Only generate Debug and Release configuration types.
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
