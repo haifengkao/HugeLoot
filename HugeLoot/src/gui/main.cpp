@@ -23,6 +23,7 @@
     <https://www.gnu.org/licenses/>.
     */
 
+/*
 #include "gui/cef/loot_app.h"
 #include "gui/state/loot_paths.h"
 
@@ -935,3 +936,4 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 #endif
+*/
