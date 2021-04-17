@@ -23,7 +23,7 @@
     <https://www.gnu.org/licenses/>.
     */
 
-#include "logging.h"
+#include "gui/state/logging.h"
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>

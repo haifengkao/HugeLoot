@@ -23,10 +23,9 @@
     <https://www.gnu.org/licenses/>.
     */
 
-#include "helpers.h"
+#include "gui/helpers.h"
 
 #ifdef _WIN32
-
 #ifndef UNICODE
 #define UNICODE
 #endif
