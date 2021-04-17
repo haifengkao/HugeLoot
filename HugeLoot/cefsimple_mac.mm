@@ -12,6 +12,24 @@
 #include "tests/cefsimple/simple_app.h"
 #include "tests/cefsimple/simple_handler.h"
 
+#include "gui/cef/loot_app.h"
+#include "gui/state/loot_paths.h"
+
+CefSettings GetCefSettings(std::filesystem::path l10nPath) {
+  CefSettings cef_settings;
+
+  // Enable CEF command line args.
+  cef_settings.command_line_args_disabled = false;
+
+  // Disable CEF logging.
+  cef_settings.log_severity = LOGSEVERITY_VERBOSE;
+
+  // Load locale pack files from LOOT's l10n path.
+  CefString(&cef_settings.locales_dir_path).FromString(l10nPath.u8string());
+
+  return cef_settings;
+}
+
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject <NSApplicationDelegate>
 
@@ -129,21 +147,31 @@ int main(int argc, char* argv[]) {
     // This is undesirable and we must enforce that this doesn't happen.
     CHECK([NSApp isKindOfClass:[SimpleApplication class]]);
 
+      // Read command line arguments.
+      CefMainArgs main_args(argc, argv);
+      const auto cliOptions = loot::CommandLineOptions(argc, argv);
+
+      // Create the process reference.
+      CefRefPtr<loot::LootApp> app(new loot::LootApp(cliOptions));
+      
+      /*
     // Parse command-line arguments for use in this method.
     CefRefPtr<CefCommandLine> command_line =
         CefCommandLine::CreateCommandLine();
-    command_line->InitFromArgv(argc, argv);
+    command_line->InitFromArgv(argc, argv);*/
 
     // Specify CEF global settings here.
-    CefSettings settings;
+    //CefSettings settings;
+    CefSettings cef_settings = GetCefSettings(app.get()->getL10nPath());
 
+      /*
     const bool with_chrome_runtime =
         command_line->HasSwitch("enable-chrome-runtime");
 
     if (with_chrome_runtime) {
       // Enable experimental Chrome runtime. See issue #2969 for details.
       settings.chrome_runtime = true;
-    }
+    }*/
 
     // When generating projects with CMake the CEF_USE_SANDBOX value will be
     // defined automatically. Pass -DUSE_SANDBOX=OFF to the CMake command-line
@@ -155,10 +183,10 @@ int main(int argc, char* argv[]) {
     // SimpleApp implements application-level callbacks for the browser process.
     // It will create the first browser instance in OnContextInitialized() after
     // CEF has initialized.
-    CefRefPtr<SimpleApp> app(new SimpleApp);
+    //CefRefPtr<SimpleApp> app(new SimpleApp);
 
     // Initialize CEF for the browser process.
-    CefInitialize(main_args, settings, app.get(), NULL);
+    CefInitialize(main_args, cef_settings, app.get(), NULL);
 
     // Create the application delegate.
     NSObject* delegate = [[SimpleAppDelegate alloc] init];
