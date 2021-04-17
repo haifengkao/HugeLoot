@@ -44,7 +44,7 @@ public:
       counter_(counter),
       sendProgressUpdate_(sendProgressUpdate) {}
 
-  std::string executeLogic() {
+  std::string executeLogic() override {
     auto logger = getLogger();
     if (logger) {
       logger->info("Beginning sorting operation.");

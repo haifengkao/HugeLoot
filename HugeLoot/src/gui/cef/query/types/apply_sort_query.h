@@ -39,7 +39,7 @@ public:
       counter_(counter),
       plugins_(plugins) {}
 
-  std::string executeLogic() {
+  std::string executeLogic() override {
     auto logger = getLogger();
     if (logger) {
       logger->trace("User has accepted sorted load order, applying it.");
