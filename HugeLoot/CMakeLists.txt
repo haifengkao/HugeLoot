@@ -24,8 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # General Settings
 ##############################
 
-set (CMAKE_BINARY_DIR ./)
-set (CMAKE_SOURCE_DIR ./)
 
 ##############################
 # Get Build Revision
@@ -45,8 +43,8 @@ ENDIF ()
 message(STATUS "Git revision: ${GIT_COMMIT_STRING}")
 
 # Write to file.
-configure_file("${CMAKE_SOURCE_DIR}/src/gui/version.cpp.in" "${CMAKE_BINARY_DIR}/generated/version.cpp" @ONLY)
-include_directories("${CMAKE_BINARY_DIR}/generated")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/gui/version.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/generated/version.cpp" @ONLY)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/generated")
 
 ##############################
 # External Projects
@@ -134,7 +132,7 @@ ExternalProject_Add(json
                     CONFIGURE_COMMAND ""
                     BUILD_COMMAND ""
                     INSTALL_COMMAND "")
-set(JSON_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/external/src")
+set(JSON_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/external/src")
 
 ExternalProject_Add(libloot
                     PREFIX "external"
@@ -146,7 +144,7 @@ ExternalProject_Add(libloot
 ExternalProject_Get_Property(libloot SOURCE_DIR)
 set(LIBLOOT_EXTRACTED_PATH ${SOURCE_DIR})
 
-include_directories("${CMAKE_SOURCE_DIR}/src"
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src"
                     "${LIBLOOT_EXTRACTED_PATH}/include")
 link_directories(${LIBLOOT_EXTRACTED_PATH})
 set(LIBLOOT_STATIC_LIBRARY "${CMAKE_STATIC_LIBRARY_PREFIX}loot${CMAKE_STATIC_LIBRARY_SUFFIX}")
@@ -181,81 +179,81 @@ set(SPDLOG_INCLUDE_DIRS "${SOURCE_DIR}/include")
 # Source files.
 #
 
-set (LOOT_GUI_SRC "${CMAKE_BINARY_DIR}/generated/version.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/main.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/helpers.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_handler.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_app.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/window_delegate.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_handler.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_settings.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/helpers.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/logging.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_paths.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_settings.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_state.cpp"
-                  "${CMAKE_SOURCE_DIR}/src/gui/resource.rc")
+set (LOOT_GUI_SRC "${CMAKE_CURRENT_SOURCE_DIR}/generated/version.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/main.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_handler.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_app.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/window_delegate.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/query_handler.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game_settings.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/helpers.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/logging.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_paths.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_settings.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_state.cpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/resource.rc")
 
-set (LOOT_GUI_HEADERS "${CMAKE_SOURCE_DIR}/src/gui/helpers.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_handler.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_app.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/window_delegate.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/derived_plugin_metadata.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/json.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_executor.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/apply_sort_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/cancel_sort_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/change_game_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clear_all_metadata_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clear_plugin_metadata_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/clipboard_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/close_settings_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_content_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_load_order_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/copy_metadata_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/discard_unapplied_changes_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/editor_opened_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/editor_closed_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_auto_sort_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_conflicting_plugins_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_game_data_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_game_types_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_init_errors_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_installed_games_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_settings_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_themes_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/get_version_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/metadata_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/open_log_location_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/open_readme_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/redate_plugins_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/save_filter_state_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/save_user_groups_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/sort_plugins_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/types/update_masterlist_query.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/cef/query/query_handler.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_detection_error.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/game_settings.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/games_manager.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/game/helpers.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/logging.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_paths.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_settings.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/loot_state.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/state/unapplied_change_counter.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/resource.h"
-                  "${CMAKE_SOURCE_DIR}/src/gui/version.h")
+set (LOOT_GUI_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_handler.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_app.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_scheme_handler_factory.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/window_delegate.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/derived_plugin_metadata.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/json.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/query_executor.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/apply_sort_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/cancel_sort_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/change_game_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/clear_all_metadata_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/clear_plugin_metadata_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/clipboard_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/close_settings_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/copy_content_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/copy_load_order_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/copy_metadata_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/discard_unapplied_changes_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/editor_opened_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/editor_closed_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_auto_sort_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_conflicting_plugins_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_game_data_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_game_types_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_init_errors_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_installed_games_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_settings_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_themes_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/get_version_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/metadata_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/open_log_location_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/open_readme_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/redate_plugins_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/save_filter_state_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/save_user_groups_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/sort_plugins_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/types/update_masterlist_query.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/query/query_handler.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game_detection_error.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game_settings.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/games_manager.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/helpers.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/logging.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_paths.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_settings.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_state.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/unapplied_change_counter.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/resource.h"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/version.h")
 
 source_group("Header Files\\gui" FILES ${LOOT_GUI_HEADERS})
 source_group("Source Files\\gui" FILES ${LOOT_GUI_SRC})
 
 # Include source and library directories.
-include_directories ("${CMAKE_SOURCE_DIR}/src"
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src"
                      ${CPPTOML_INCLUDE_DIRS}
                      ${JSON_INCLUDE_DIRS}
                      ${Boost_INCLUDE_DIRS}
