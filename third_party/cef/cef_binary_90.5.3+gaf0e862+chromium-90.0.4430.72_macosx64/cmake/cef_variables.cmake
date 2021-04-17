@@ -63,7 +63,7 @@ set(CEF_LIBCEF_DLL_WRAPPER_PATH "${_CEF_ROOT}/libcef_dll")
 
 # Shared compiler/linker flags.
 list(APPEND CEF_COMPILER_DEFINES
-  # Allow C++ programs to use stdint.h macros specified in the C99 standard that aren't 
+  # Allow C++ programs to use stdint.h macros specified in the C99 standard that aren't
   # in the C++ standard (e.g. UINT8_MAX, INT64_MIN, etc)
   __STDC_CONSTANT_MACROS __STDC_FORMAT_MACROS
   )
@@ -101,8 +101,9 @@ if(OS_LINUX)
     -std=c99                        # Use the C99 language standard
     )
   list(APPEND CEF_CXX_COMPILER_FLAGS
-    -fno-exceptions                 # Disable exceptions
-    -fno-rtti                       # Disable real-time type information
+    # -fno-exceptions                 # Disable exceptions
+    # -fno-rtti                       # Disable real-time type information
+    -Wno-reorder
     -fno-threadsafe-statics         # Don't generate thread-safe statics
     -fvisibility-inlines-hidden     # Give hidden visibility to inlined class member functions
     -std=gnu++11                    # Use the C++11 language standard including GNU extensions
@@ -269,12 +270,13 @@ if(OS_MAC)
     -std=c99                        # Use the C99 language standard
     )
   list(APPEND CEF_CXX_COMPILER_FLAGS
-    -fno-exceptions                 # Disable exceptions
-    -fno-rtti                       # Disable real-time type information
+    # -fno-exceptions                 # Disable exceptions
+    # -fno-rtti                       # Disable real-time type information
+    -Wno-reorder
     -fno-threadsafe-statics         # Don't generate thread-safe statics
     -fobjc-call-cxx-cdtors          # Call the constructor/destructor of C++ instance variables in ObjC objects
     -fvisibility-inlines-hidden     # Give hidden visibility to inlined class member functions
-    -std=gnu++11                    # Use the C++11 language standard including GNU extensions
+    -std=c++17                    # Use the C++11 language standard including GNU extensions
     -Wno-narrowing                  # Don't warn about type narrowing
     -Wsign-compare                  # Warn about mixed signed/unsigned type comparisons
     )
@@ -312,7 +314,7 @@ if(OS_MAC)
 
   # Find the newest available base SDK.
   execute_process(COMMAND xcode-select --print-path OUTPUT_VARIABLE XCODE_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-  foreach(OS_VERSION 10.15 10.14 10.13 10.12 10.11)
+  foreach(OS_VERSION 11.0 10.15 10.14 10.13 10.12 10.11)
     set(SDK "${XCODE_PATH}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${OS_VERSION}.sdk")
     if(NOT "${CMAKE_OSX_SYSROOT}" AND EXISTS "${SDK}" AND IS_DIRECTORY "${SDK}")
       set(CMAKE_OSX_SYSROOT ${SDK})
@@ -320,7 +322,7 @@ if(OS_MAC)
   endforeach()
 
   # Target SDK.
-  set(CEF_TARGET_SDK               "10.11")
+  set(CEF_TARGET_SDK               "10.15")
   list(APPEND CEF_COMPILER_FLAGS
     -mmacosx-version-min=${CEF_TARGET_SDK}
   )

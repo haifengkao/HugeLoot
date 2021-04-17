@@ -302,7 +302,7 @@ macro(SET_COMMON_TARGET_PROPERTIES target)
     # Set Xcode target properties.
     set_target_properties(${target} PROPERTIES
       XCODE_ATTRIBUTE_ALWAYS_SEARCH_USER_PATHS                    NO
-      XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD                 "gnu++11"   # -std=gnu++11
+      XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD                 "c++17"   # -std=gnu++11
       XCODE_ATTRIBUTE_CLANG_LINK_OBJC_RUNTIME                     NO          # -fno-objc-link-runtime
       XCODE_ATTRIBUTE_CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS  YES         # -Wobjc-missing-property-synthesis
       XCODE_ATTRIBUTE_COPY_PHASE_STRIP                            NO
@@ -310,8 +310,8 @@ macro(SET_COMMON_TARGET_PROPERTIES target)
       XCODE_ATTRIBUTE_GCC_C_LANGUAGE_STANDARD                     "c99"       # -std=c99
       XCODE_ATTRIBUTE_GCC_CW_ASM_SYNTAX                           NO          # No -fasm-blocks
       XCODE_ATTRIBUTE_GCC_DYNAMIC_NO_PIC                          NO
-      XCODE_ATTRIBUTE_GCC_ENABLE_CPP_EXCEPTIONS                   NO          # -fno-exceptions
-      XCODE_ATTRIBUTE_GCC_ENABLE_CPP_RTTI                         NO          # -fno-rtti
+      XCODE_ATTRIBUTE_GCC_ENABLE_CPP_EXCEPTIONS                   YES          # -fno-exceptions
+      XCODE_ATTRIBUTE_GCC_ENABLE_CPP_RTTI                         YES          # -fno-rtti
       XCODE_ATTRIBUTE_GCC_ENABLE_PASCAL_STRINGS                   NO          # No -mpascal-strings
       XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN              YES         # -fvisibility-inlines-hidden
       XCODE_ATTRIBUTE_GCC_OBJC_CALL_CXX_CDTORS                    YES         # -fobjc-call-cxx-cdtors

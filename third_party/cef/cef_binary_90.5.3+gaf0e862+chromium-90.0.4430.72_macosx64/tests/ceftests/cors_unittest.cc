@@ -1787,3 +1787,4 @@ CORS_TEST_REDIRECT_POST_ALL(307, MODE_307)
 void CreateCorsBrowserTests(client::ClientAppBrowser::DelegateSet& delegates) {
   delegates.insert(new CorsBrowserTest);
 }
+
