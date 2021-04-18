@@ -29,7 +29,7 @@ namespace gui {
 const unsigned int Version::major = 0;
 const unsigned int Version::minor = 16;
 const unsigned int Version::patch = 0;
-const std::string Version::revision = "78395aba";
+const std::string Version::revision = "b7ab704";
 
 std::string Version::string() {
   return std::to_string(major) + '.' + std::to_string(minor) + '.' + std::to_string(patch);

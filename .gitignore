@@ -56,3 +56,5 @@ third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64.tar.bz
 third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64/Debug
 Chromium Embedded Framework
 third_party/cef/cef_binary_90.5.3+gaf0e862+chromium-90.0.4430.72_macosx64/Release
+HugeLoot/node_modules
+HugeLoot/build

@@ -21,8 +21,30 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ##############################
-# General Settings
+# OS Specific Setting
 ##############################
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(SYSTEM_NAME "Windows")
+    set (Boost_USE_STATIC_LIBS ON)
+ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set(SYSTEM_NAME "Darwin")
+
+    # a workaround for homebrew boost 1.75.0 https://github.com/Homebrew/homebrew-core/issues/67427#issuecomment-754141236
+    set (Boost_USE_STATIC_LIBS OFF)
+
+    # workaround because find_package(Boost) Could NOT find Threads
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_WIN32_THREADS_INIT 0)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+ELSE ()
+    set (Boost_USE_STATIC_LIBS ON)
+    set(SYSTEM_NAME "Other")
+ENDIF ()
+
+set (Boost_USE_MULTITHREADED ON)
 
 
 ##############################
@@ -43,51 +65,12 @@ ENDIF ()
 message(STATUS "Git revision: ${GIT_COMMIT_STRING}")
 
 # Write to file.
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/gui/version.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/generated/version.cpp" @ONLY)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/generated")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/gui/version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp" @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 ##############################
 # External Projects
 ##############################
-
-IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(SYSTEM_NAME "Windows")
-    if(CMAKE_SIZEOF_VOID_P MATCHES 8)
-        set(CEF_PLATFORM "windows64")
-    else()
-        set(CEF_PLATFORM "windows32")
-    endif()
-    set (Boost_USE_STATIC_LIBS ON)
-ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(SYSTEM_NAME "Darwin")
-
-    if("${PROJECT_ARCH}" STREQUAL "arm64")
-        set(CEF_PLATFORM "macosarm64")
-    else()
-        set(CEF_PLATFORM "macosx64")
-    endif()
-
-    # a workaround for homebrew boost 1.75.0 https://github.com/Homebrew/homebrew-core/issues/67427#issuecomment-754141236
-    set (Boost_USE_STATIC_LIBS OFF)
-
-    # workaround because find_package(Boost) Could NOT find Threads
-    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-    set(CMAKE_HAVE_THREADS_LIBRARY 1)
-    set(CMAKE_USE_WIN32_THREADS_INIT 0)
-    set(CMAKE_USE_PTHREADS_INIT 1)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-
-ELSE ()
-    set (Boost_USE_STATIC_LIBS ON)
-    set(SYSTEM_NAME "Other")
-    if(CMAKE_SIZEOF_VOID_P MATCHES 8)
-        set(CEF_PLATFORM "linux64")
-    else()
-        set(CEF_PLATFORM "linux32")
-    endif()
-ENDIF ()
-
-set (Boost_USE_MULTITHREADED ON)
 
 IF (MSVC)
     set (Boost_USE_STATIC_RUNTIME ${MSVC_STATIC_RUNTIME})
@@ -175,11 +158,11 @@ ExternalProject_Add(spdlog
 ExternalProject_Get_Property(spdlog SOURCE_DIR)
 set(SPDLOG_INCLUDE_DIRS "${SOURCE_DIR}/include")
 
-#
-# Source files.
-#
+##############################
+# General Settings
+##############################
 
-set (LOOT_GUI_SRC "${CMAKE_CURRENT_SOURCE_DIR}/generated/version.cpp"
+set (LOOT_GUI_SRC "${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/main.cpp"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.cpp"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/cef/loot_handler.cpp"
@@ -249,8 +232,45 @@ set (LOOT_GUI_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.h"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/resource.h"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/version.h")
 
+set(LOOT_GUI_TESTS_SRC "${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game_settings.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/helpers.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/logging.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_paths.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_settings.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_state.cpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/main.cpp")
+
+set (LOOT_GUI_TESTS_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/helpers.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/game/game_settings.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_paths.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_settings.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/state/loot_state.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/cef/query/json_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/cef/query/types/close_settings_query_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/cef/query/types/editor_closed_query_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/cef/query/types/get_settings_query_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/cef/query/types/get_themes_query_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/game/game_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/game/game_settings_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/game/games_manager_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/game/helpers_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/loot_paths_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/loot_settings_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/state/unapplied_change_counter_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/helpers_test.h"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/gui/test_helpers.h")
+
 source_group("Header Files\\gui" FILES ${LOOT_GUI_HEADERS})
+source_group("Header Files\\tests" FILES ${LOOT_TESTS_HEADERS})
+source_group("Header Files\\tests" FILES ${LOOT_GUI_TESTS_HEADERS})
+
 source_group("Source Files\\gui" FILES ${LOOT_GUI_SRC})
+source_group("Source Files\\tests" FILES ${LOOT_TESTS_SRC})
+source_group("Header Files\\tests" FILES ${LOOT_GUI_TESTS_SRC})
 
 # Include source and library directories.
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -311,6 +331,10 @@ IF (MSVC)
     set (LOOT_GUI_LIBS comctl32
                        Psapi)
 ENDIF ()
+
+##############################
+# CEFSimple Sample Codes (TODO: download linux and win32 sample codes)
+##############################
 
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
@@ -393,6 +417,9 @@ set(HugeLootDep libcef_dll_wrapper cpptoml json libloot spdlog)
 set(HugeLootLib libcef_dll_wrapper ${CEF_STANDARD_LIBS} ${Boost_LIBRARIES} ${LIBLOOT_LINK_LIBRARY} ${LOOT_GUI_LIBS} ${ICU_LIBRARIES})
 
 
+##############################
+# CEF Simple Setting
+##############################
 #
 # Linux configuration.
 #
@@ -551,3 +578,96 @@ if(OS_WINDOWS)
   COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
   COPY_FILES("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
 endif()
+
+message(WARNING, =====hi msvc: ${MSVC}\n,
+        CEF_TARGET: ${CEF_TARGET}\n,
+        CEF_ROOT: ${CEF_ROOT}\n,
+        CEF_BINARY_FILES: ${CEF_BINARY_FILES}\n,
+        CEF_BINARY_DIR: ${CEF_BINARY_DIR}\n,
+        CEF_TARGET_OUT_DIR: ${CEF_TARGET_OUT_DIR}\n,
+        CEF_RESOURCE_DIR: ${CEF_RESOURCE_DIR}\n,
+        CEF_RESOURCE_FILES: ${CEF_RESOURCE_FILES}\n,
+        CEF_SANDBOX_LIB_RELEASE: ${CEF_SANDBOX_LIB_RELEASE}\n,
+        gCEF_SANDBOX_STANDARD_LIBSui: ${CEF_SANDBOX_STANDARD_LIBS}\n,
+        CEF_LIBCEF_DLL_WRAPPER_PATH: ${CEF_LIBCEF_DLL_WRAPPER_PATH}\n,
+        CEF_TARGET: ${CEF_TARGET}\n
+        )
+
+##############################
+# Define Targets
+##############################
+
+# Build application tests.
+add_executable       (loot_gui_tests ${LOOT_GUI_TESTS_SRC} ${LOOT_GUI_TESTS_HEADERS})
+add_dependencies     (loot_gui_tests cpptoml libloot spdlog GTest testing-plugins)
+target_link_libraries(loot_gui_tests ${Boost_LIBRARIES} ${LIBLOOT_LINK_LIBRARY} ${GTEST_LIBRARIES} ${LOOT_TEST_LIBS} ${ICU_LIBRARIES})
+
+##############################
+# Set Target-Specific Flags
+##############################
+
+IF (MSVC)
+    set (LOOT_LINK_FLAGS "/SUBSYSTEM:WINDOWS /LARGEADDRESSAWARE")
+    get_target_property (EXISTING_LINK_FLAGS LOOT LINK_FLAGS)
+    IF (EXISTING_LINK_FLAGS)
+        set (LOOT_LINK_FLAGS "${EXISTING_LINK_FLAGS} ${LOOT_LINK_FLAGS}")
+    ENDIF ()
+    set_target_properties (LOOT PROPERTIES LINK_FLAGS ${LOOT_LINK_FLAGS})
+ENDIF ()
+
+##############################
+# Post-Build Steps
+##############################
+
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_custom_command(
+        TARGET LOOT
+        POST_BUILD
+        COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/src/gui/LOOT.exe.manifest\" -inputresource:"$(TargetDir)$(TargetFileName)"\;\#1 -outputresource:"$(TargetDir)$(TargetFileName)"\;\#1
+        COMMENT "Adding manifest..."
+    )
+ENDIF ()
+
+# Copy CEF binaries.
+FOREACH(cef_dll ${CEF_PRECOMPILED_BINARIES})
+    add_custom_command(TARGET HugeLoot POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CEF_PRECOMPILED_BINARIES_DIR}/${cef_dll}"
+            $<TARGET_FILE_DIR:HugeLoot>/${cef_dll})
+ENDFOREACH()
+
+# Copy CEF resources.
+FOREACH(cef_resource ${CEF_RESOURCES})
+    add_custom_command(TARGET HugeLoot POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CEF_RESOURCES_DIR}/${cef_resource}"
+            $<TARGET_FILE_DIR:HugeLoot>/${cef_resource})
+ENDFOREACH()
+
+# Copy CEF en-US locale resource.
+add_custom_command(TARGET HugeLoot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CEF_LOCALES_DIR}/${CEF_LOCALE_FILE}"
+        $<TARGET_FILE_DIR:HugeLoot>/resources/l10n/${CEF_LOCALE_FILE})
+
+# Copy the API binary to the build directory.
+add_custom_command(TARGET HugeLoot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${LIBLOOT_EXTRACTED_PATH}/${LIBLOOT_SHARED_LIBRARY}"
+        "$<TARGET_FILE_DIR:HugeLoot>/${LIBLOOT_SHARED_LIBRARY}")
+add_custom_command(TARGET loot_gui_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${LIBLOOT_EXTRACTED_PATH}/${LIBLOOT_SHARED_LIBRARY}"
+        "$<TARGET_FILE_DIR:loot_gui_tests>/${LIBLOOT_SHARED_LIBRARY}")
+
+# Build the UI HTML.
+add_custom_command(TARGET HugeLoot POST_BUILD
+    COMMAND yarn build
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Copy testing plugins
+ExternalProject_Get_Property(testing-plugins SOURCE_DIR)
+add_custom_command(TARGET loot_gui_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${SOURCE_DIR}
+        $<TARGET_FILE_DIR:loot_gui_tests>)
