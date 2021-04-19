@@ -608,11 +608,11 @@ target_link_libraries(loot_gui_tests ${Boost_LIBRARIES} ${LIBLOOT_LINK_LIBRARY} 
 
 IF (MSVC)
     set (LOOT_LINK_FLAGS "/SUBSYSTEM:WINDOWS /LARGEADDRESSAWARE")
-    get_target_property (EXISTING_LINK_FLAGS LOOT LINK_FLAGS)
+    get_target_property (EXISTING_LINK_FLAGS HugeLoot LINK_FLAGS)
     IF (EXISTING_LINK_FLAGS)
         set (LOOT_LINK_FLAGS "${EXISTING_LINK_FLAGS} ${LOOT_LINK_FLAGS}")
     ENDIF ()
-    set_target_properties (LOOT PROPERTIES LINK_FLAGS ${LOOT_LINK_FLAGS})
+    set_target_properties (HugeLoot PROPERTIES LINK_FLAGS ${LOOT_LINK_FLAGS})
 ENDIF ()
 
 ##############################
