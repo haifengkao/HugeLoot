@@ -20,6 +20,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(WinSampleDir win)
+
 ##############################
 # OS Specific Setting
 ##############################
@@ -353,10 +355,10 @@ set(CEFSIMPLE_SRCS_MAC
   simple_handler_mac.mm
   )
 set(CEFSIMPLE_SRCS_WINDOWS
-  cefsimple.rc
-  cefsimple_win.cc
-  resource.h
-  simple_handler_win.cc
+  ${WinSampleDir}/cefsimple.rc
+  ${WinSampleDir}/cefsimple_win.cc
+  ${WinSampleDir}/resource.h
+  ${WinSampleDir}/simple_handler_win.cc
   )
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_SRCS})
@@ -572,7 +574,7 @@ if(OS_WINDOWS)
   endif()
 
   # Add the custom manifest files to the executable.
-  ADD_WINDOWS_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_TARGET}" "exe")
+  ADD_WINDOWS_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}/${WinSampleDir}" "${CEF_TARGET}" "exe")
 
   # Copy binary and resource files to the target output directory.
   COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
@@ -590,7 +592,8 @@ message(WARNING, =====hi msvc: ${MSVC}\n,
         CEF_SANDBOX_LIB_RELEASE: ${CEF_SANDBOX_LIB_RELEASE}\n,
         gCEF_SANDBOX_STANDARD_LIBSui: ${CEF_SANDBOX_STANDARD_LIBS}\n,
         CEF_LIBCEF_DLL_WRAPPER_PATH: ${CEF_LIBCEF_DLL_WRAPPER_PATH}\n,
-        CEF_TARGET: ${CEF_TARGET}\n
+        CEF_TARGET: ${CEF_TARGET}\n,
+        Sample: "${CMAKE_CURRENT_SOURCE_DIR}/${WinSampleDir}"
         )
 
 ##############################
