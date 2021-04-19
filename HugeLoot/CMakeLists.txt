@@ -621,7 +621,7 @@ ENDIF ()
 
 IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_custom_command(
-        TARGET LOOT
+        TARGET HugeLoot
         POST_BUILD
         COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}/src/gui/LOOT.exe.manifest\" -inputresource:"$(TargetDir)$(TargetFileName)"\;\#1 -outputresource:"$(TargetDir)$(TargetFileName)"\;\#1
         COMMENT "Adding manifest..."
