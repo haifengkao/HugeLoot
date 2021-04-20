@@ -37,25 +37,25 @@ function getBinaryParentPaths(rootPath) {
             path: path.join(rootPath, 'debug'),
             label: null
         },
+
+        // windows location
         {
-            path: path.join(rootPath, 'build'),
-            label: null
-        },
-        {
-            path: path.join(rootPath, 'build', '32'),
+            path: path.join(rootPath, '32', 'release'),
             label: '32-bit'
         },
         {
-            path: path.join(rootPath, 'build', '64'),
+            path: path.join(rootPath, '64', 'release'),
+            label: '64-bit'
+        },
+        {
+            path: path.join(rootPath, '32', 'debug'),
+            label: '32-bit'
+        },
+        {
+            path: path.join(rootPath, '64', 'debug'),
             label: '64-bit'
         }
     ];
-
-    if (os.platform() === 'win32') {
-        paths.forEach(parentPath => {
-            parentPath.path = path.join(parentPath.path, 'Release');
-        });
-    }
 
     return paths;
 }
