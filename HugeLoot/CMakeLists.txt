@@ -8,6 +8,9 @@ cmake_policy(SET CMP0074 NEW) # find_package uses <PackageName>_ROOT variables, 
 project (HugeLOOT)
 include(ExternalProject)
 
+# options(case sesitive): release, debug
+set (Active_Scheme debug)
+
 option(MSVC_STATIC_RUNTIME "Build with static runtime libs (/MT)" OFF)
 
 IF (${MSVC_STATIC_RUNTIME})
@@ -117,19 +120,22 @@ ExternalProject_Add(json
                     INSTALL_COMMAND "")
 set(JSON_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/external/src")
 
+
+set(LIBLOOT_BASE_PATH "../../../BigLoot/")
 ExternalProject_Add(libloot
                     PREFIX "external"
                     # URL ${LIBLOOT_URL}
-                    SOURCE_DIR "../../../BigLoot/build/Debug"
+                    SOURCE_DIR ${LIBLOOT_BASE_PATH}/build/${Active_Scheme}
                     CONFIGURE_COMMAND ""
                     BUILD_COMMAND ""
                     INSTALL_COMMAND "")
 ExternalProject_Get_Property(libloot SOURCE_DIR)
 set(LIBLOOT_EXTRACTED_PATH ${SOURCE_DIR})
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src"
-                    "${LIBLOOT_EXTRACTED_PATH}/include")
-link_directories(${LIBLOOT_EXTRACTED_PATH})
+# dirty directory path fix (why does them work?)
+include_directories("../../BigLoot/include")
+link_directories("../../BigLoot/build")
+
 set(LIBLOOT_STATIC_LIBRARY "${CMAKE_STATIC_LIBRARY_PREFIX}loot${CMAKE_STATIC_LIBRARY_SUFFIX}")
 set(LIBLOOT_SHARED_LIBRARY "${CMAKE_SHARED_LIBRARY_PREFIX}loot${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
@@ -151,7 +157,7 @@ set(CPPTOML_INCLUDE_DIRS "${SOURCE_DIR}/include")
 
 ExternalProject_Add(spdlog
                     PREFIX "external"
-                    URL "https://github.com/gabime/spdlog/archive/v1.8.2.tar.gz"
+                    URL "https://github.com/gabime/spdlog/archive/v1.8.5.tar.gz"
                     CONFIGURE_COMMAND ""
                     BUILD_COMMAND ""
                     INSTALL_COMMAND "")
