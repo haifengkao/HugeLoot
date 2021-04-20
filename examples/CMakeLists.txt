@@ -8,6 +8,17 @@
 #
 
 if(OS_MAC)
+
+  option(OPTION_USE_ARC "Build with ARC (automatic Reference Counting) on macOS." ON)
+  if(OPTION_USE_ARC)
+    list(APPEND CEF_COMPILER_FLAGS
+      -fobjc-arc
+      )
+    set_target_properties(${target} PROPERTIES
+      CLANG_ENABLE_OBJC_ARC "YES"
+      )
+  endif()
+
   # Shared macOS resources (menus, icons, etc).
   set(SHARED_RESOURCES_SRCS
     ../shared/resources/mac/English.lproj/InfoPlist.strings

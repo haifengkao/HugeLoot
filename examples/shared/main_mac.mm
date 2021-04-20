@@ -122,7 +122,9 @@ int main(int argc, char* argv[]) {
     return 1;
 
   // Initialize the AutoRelease pool.
-  NSAutoreleasePool* autopool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+        
+    
 
   // Provide CEF with command-line arguments.
   CefMainArgs main_args(argc, argv);
@@ -158,11 +160,10 @@ int main(int argc, char* argv[]) {
   // Shut down CEF.
   CefShutdown();
 
-  // Release the delegate.
-  [delegate release];
 
-  // Release the AutoRelease pool.
-  [autopool release];
+
+    }
+
 
   return 0;
 }
