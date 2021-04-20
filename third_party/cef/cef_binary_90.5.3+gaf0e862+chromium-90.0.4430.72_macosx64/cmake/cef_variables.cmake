@@ -322,10 +322,10 @@ if(OS_MAC)
   endforeach()
 
   # Target SDK.
-  set(CEF_TARGET_SDK               "10.15")
-  list(APPEND CEF_COMPILER_FLAGS
-    -mmacosx-version-min=${CEF_TARGET_SDK}
-  )
+#   set(CEF_TARGET_SDK               "11.0")
+#   list(APPEND CEF_COMPILER_FLAGS
+#     -mmacosx-version-min=${CEF_TARGET_SDK}
+#   )
   set(CMAKE_OSX_DEPLOYMENT_TARGET  ${CEF_TARGET_SDK})
 
   # Target architecture.
