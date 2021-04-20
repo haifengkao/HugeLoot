@@ -128,7 +128,7 @@ add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
 # add_subdirectory(${CEF_ROOT}/tests/cefsimple)
 # add_subdirectory(${CEF_ROOT}/tests/gtest)
 # add_subdirectory(${CEF_ROOT}/tests/ceftests)
-add_subdirectory(HugeLoot)
+# add_subdirectory(HugeLoot)
 
 add_subdirectory(examples)
 

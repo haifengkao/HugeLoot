@@ -61,3 +61,8 @@ HugeLoot/node_modules
 HugeLoot/build
 *.bz2
 *.sha1
+HugeLoot/CMakeFiles/3.20.1/CompilerIdCXX/XCBuildData
+HugeLoot/CMakeFiles/3.20.1/CompilerIdCXX/CompilerIdCXX.build
+HugeLoot/CMakeFiles
+examples/message_router/node_modules
+HugeLoot/examples/message_router/external
