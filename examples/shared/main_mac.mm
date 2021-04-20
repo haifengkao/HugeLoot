@@ -14,6 +14,25 @@
 #include "examples/shared/app_factory.h"
 #include "examples/shared/client_manager.h"
 
+#include "gui/cef/loot_app.h"
+#include "gui/state/loot_paths.h"
+
+CefSettings GetCefSettings(std::filesystem::path l10nPath) {
+  CefSettings cef_settings;
+
+  // Enable CEF command line args.
+  cef_settings.command_line_args_disabled = false;
+
+  // Disable CEF logging.
+  cef_settings.log_severity = LOGSEVERITY_VERBOSE;
+
+  // Load locale pack files from LOOT's l10n path.
+  CefString(&cef_settings.locales_dir_path).FromString(l10nPath.u8string());
+
+  return cef_settings;
+}
+
+
 // Receives notifications from the application.
 @interface SharedAppDelegate : NSObject<NSApplicationDelegate>
 - (void)createApplication:(id)object;
@@ -139,6 +158,12 @@ int main(int argc, char* argv[]) {
   // Create the singleton manager instance.
   ClientManager manager;
 
+        const auto cliOptions = loot::CommandLineOptions(argc, argv);
+
+        // Create the process reference.
+        //CefRefPtr<loot::LootApp> app(new loot::LootApp(cliOptions));
+
+        //CefSettings settings = GetCefSettings(app.get()->getL10nPath());
   // Specify CEF global settings here.
   CefSettings settings;
 

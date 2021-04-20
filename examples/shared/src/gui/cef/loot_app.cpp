@@ -77,6 +77,10 @@ std::filesystem::path LootApp::getL10nPath() const {
 void LootApp::OnBeforeCommandLineProcessing(
     const CefString& process_type,
     CefRefPtr<CefCommandLine> command_line) {
+#if defined(OS_MACOSX)
+      // Disable the macOS keychain prompt. Cookies will not be encrypted.
+      command_line->AppendSwitch("use-mock-keychain");
+#endif
   if (process_type.empty()) {
     // Browser process, OK to modify the command line.
 
