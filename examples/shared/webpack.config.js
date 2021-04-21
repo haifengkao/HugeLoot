@@ -1,10 +1,16 @@
 const path = require('path');
+const os = require('os');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { getAppReleasePaths } = require('./scripts/helpers');
 
 const hugeLootBuildPath = path.join(__dirname, '..', '..', 'build');
-const releasePath = getAppReleasePaths(hugeLootBuildPath)[0].path;
+var releasePath = getAppReleasePaths(hugeLootBuildPath)[0].path;
+
+if (os.platform() === 'darwin') {
+    releasePath = path.resolve(releasePath, 'HugeLoot.app', 'Contents', 'MacOS');
+    console.log('release:', releasePath);
+}
 
 // Constant with our paths
 const paths = {

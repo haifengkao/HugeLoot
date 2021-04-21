@@ -57,7 +57,7 @@ function getBinaryParentPaths(rootPath) {
         }
     ];
 
-    console.log(paths);
+    console.log('paths:', paths);
 
     return paths;
 }
