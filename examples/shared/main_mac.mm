@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
 
   // Create a CefApp for the browser process. Other processes are handled by
   // process_helper_mac.cc.
-  CefRefPtr<CefApp> app = CreateBrowserProcessApp();
+  //CefRefPtr<CefApp> app = CreateBrowserProcessApp();
 
   // Initialize the SharedApplication instance.
   [SharedApplication sharedApplication];
@@ -161,11 +161,11 @@ int main(int argc, char* argv[]) {
         const auto cliOptions = loot::CommandLineOptions(argc, argv);
 
         // Create the process reference.
-        //CefRefPtr<loot::LootApp> app(new loot::LootApp(cliOptions));
+        CefRefPtr<loot::LootApp> app(new loot::LootApp(cliOptions));
 
-        //CefSettings settings = GetCefSettings(app.get()->getL10nPath());
+        CefSettings settings = GetCefSettings(app.get()->getL10nPath());
   // Specify CEF global settings here.
-  CefSettings settings;
+  //CefSettings settings;
 
   // Initialize CEF for the browser process. The first browser instance will be
   // created in CefBrowserProcessHandler::OnContextInitialized() after CEF has
