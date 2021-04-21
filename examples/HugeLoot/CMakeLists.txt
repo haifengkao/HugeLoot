@@ -59,10 +59,10 @@ endif()
 #
 
 # Target executable names.
-set(EXAMPLE_TARGET "message_router")
+set(EXAMPLE_TARGET "HugeLoot")
 if(OS_MAC)
-  set(EXAMPLE_HELPER_TARGET "message_router_Helper")
-  set(EXAMPLE_HELPER_OUTPUT_NAME "message_router Helper")
+  set(EXAMPLE_HELPER_TARGET "HugeLoot_Helper")
+  set(EXAMPLE_HELPER_OUTPUT_NAME "HugeLoot Helper")
 endif()
 
 

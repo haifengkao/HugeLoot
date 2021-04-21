@@ -67,3 +67,4 @@ HugeLoot/CMakeFiles
 examples/message_router/node_modules
 HugeLoot/examples/message_router/external
 examples/shared/node_modules
+examples/shared/build

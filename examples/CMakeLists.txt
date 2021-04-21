@@ -133,5 +133,5 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 add_subdirectory(shared)
 
 # Example executable targets.
-add_subdirectory(message_router)
+add_subdirectory(HugeLoot)
 

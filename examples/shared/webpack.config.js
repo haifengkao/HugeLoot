@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { getAppReleasePaths } = require('./scripts/helpers');
 
-const hugeLootBuildPath = path.join(__dirname, '..', 'build', 'HugeLoot');
+const hugeLootBuildPath = path.join(__dirname, '..', '..', 'build');
 const releasePath = getAppReleasePaths(hugeLootBuildPath)[0].path;
 
 // Constant with our paths

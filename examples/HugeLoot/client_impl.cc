@@ -2,7 +2,7 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
-#include "examples/message_router/client_impl.h"
+#include "examples/HugeLoot/client_impl.h"
 
 #include "include/wrapper/cef_helpers.h"
 
