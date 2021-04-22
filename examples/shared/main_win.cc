@@ -12,6 +12,9 @@
 #include "examples/shared/client_manager.h"
 #include "examples/shared/main_util.h"
 
+#include "gui/cef/loot_app.h"
+#include "gui/state/loot_paths.h"
+
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
 // automatically if using the required compiler version. Pass -DUSE_SANDBOX=OFF
 // to the CMake command-line to disable use of the sandbox.
@@ -38,8 +41,15 @@ int APIENTRY wWinMain(HINSTANCE hInstance) {
   // Create a temporary CommandLine object.
   CefRefPtr<CefCommandLine> command_line = CreateCommandLine(main_args);
 
+  const auto cliOptions = loot::CommandLineOptions(argc, argv);
+
+  // Create the process reference.
+  CefRefPtr<loot::LootApp> app(new loot::LootApp(cliOptions));
+
+  CefSettings settings = GetCefSettings(app.get()->getL10nPath());
+
   // Create a CefApp of the correct process type.
-  CefRefPtr<CefApp> app;
+//  CefRefPtr<CefApp> app;
   switch (GetProcessType(command_line)) {
     case PROCESS_TYPE_BROWSER:
       app = CreateBrowserProcessApp();
@@ -65,7 +75,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance) {
   ClientManager manager;
 
   // Specify CEF global settings here.
-  CefSettings settings;
+//  CefSettings settings;
 
 #if !defined(CEF_USE_SANDBOX)
   settings.no_sandbox = true;
